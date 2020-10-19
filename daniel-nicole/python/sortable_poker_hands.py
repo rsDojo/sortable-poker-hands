@@ -79,39 +79,34 @@ class PokerHand(object):
         self.hand = hand
         self.cards = [PokerCard(card) for card in hand.split(' ')]
         self.cards.sort()
+        self.hand_weight = self._calculate_hand_weight()
         
-    def __eq__(self, other: PokerHand):
-        self_hand_weight = self.get_hand_weight()
-        other_hand_weight = other.get_hand_weight()
-
-        if self_hand_weight[0] != other_hand_weight[0]:
+    def __eq__(self, other):
+        if self.hand_weight[0] != other.hand_weight[0]:
             return False
         
-        for i in range(1, len(self_hand_weight)):
-            if self_hand_weight[i] != other_hand_weight[i]:
+        for i in range(1, len(self.hand_weight)):
+            if self.hand_weight[i] != other.hand_weight[i]:
                 return False
         return True
     
-    def __lt__(self, other: PokerHand):
-        self_hand_weight = self.get_hand_weight()
-        other_hand_weight = other.get_hand_weight()
-
-        if self_hand_weight[0] < other_hand_weight[0]:
+    def __lt__(self, other):
+        if self.hand_weight[0] < other.hand_weight[0]:
             return True
         
         # if both hands have teh same weight, the tie must be broken by highest ranking cards.
-        if self_hand_weight[0] == other_hand_weight[0]:
-            for i in range(1, len(self_hand_weight)):
+        if self.hand_weight[0] == other.hand_weight[0]:
+            for i in range(1, len(self.hand_weight)):
                 # if the rank is also equal, you want to check the next cards, if any are left
-                if self_hand_weight[i] == other_hand_weight[i]:
+                if self.hand_weight[i] == other.hand_weight[i]:
                     continue
-                if self_hand_weight[i] < other_hand_weight[i]:
+                if self.hand_weight[i] < other.hand_weight[i]:
                     return True
                 return False
         # if it is a tie
         return False
 
-    def get_hand_weight(self):
+    def _calculate_hand_weight(self):
         '''Analize hand strenght.
 
         Returns:
@@ -220,21 +215,22 @@ class PokerCard(object):
         suit (str): The suit of the card.
     '''
     def __repr__(self):
-        return self.get_card_weight()
+        return self.card_weight
     
     def __init__(self, card: str):
         self.card = card
         self.rank = card[0]
         self.suit = card[1]
+        self.card_weight = self.get_card_weight()
     
-    def __eq__(self, other: PokerCard):
-        return True if self.get_card_weight() == other.get_card_weight() else False
+    def __eq__(self, other):
+        return True if self.card_weight == other.card_weight else False
     
-    def __lt__(self, other: PokerCard):
-        return True if self.get_card_weight() < other.get_card_weight() else False
+    def __lt__(self, other):
+        return True if self.card_weight < other.card_weight else False
     
-    def __sub__(self, other: PokerCard):
-        return self.get_card_weight() - other.get_card_weight()
+    def __sub__(self, other):
+        return self.card_weight - other.card_weight
     
     def get_card_weight(self):
         '''Return the card weight based on its rank.'''
